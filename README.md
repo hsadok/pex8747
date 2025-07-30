@@ -12,7 +12,7 @@ Install the dependencies:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip3 install -e ixy.py
+pip3 install -e ./ixy
 ```
 ## Run
 To identify all the PCIe bridges from PEX, run:
