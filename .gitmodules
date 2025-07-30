@@ -1,0 +1,3 @@
+[submodule "ixy.py"]
+	path = ixy.py
+	url = https://github.com/hsadok/ixy.py.git
