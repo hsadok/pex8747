@@ -25,12 +25,25 @@ Activate the virtual environment if not already activated.
 source venv/bin/activate
 ```
 
-Now run the script specifying the PCIe address of all the PEX 8747 bridge associated with the same switch:
+Now run the script specifying the PCIe address of the upstream PEX 8747 bridge for the switch:
 ```bash
-./config_pex8747.py UP_PORT DOWN_PORT1 DOWN_PORT2
+./pex8747.py SWITCH_UP_BRIDGE
 ```
 
-For example:
+### Example
+
+Run `lspci` to find the upstream bridge address:
+
 ```bash
-./config_pex8747.py d8:00.0 d9:08.0 d9:10.0
+sudo lspci -d10b5:
+
+d8:00.0 PCI bridge: PLX Technology, Inc. PEX 8747 48-Lane, 5-Port PCI Express Gen 3 (8.0 GT/s) Switch (rev ca)
+d9:08.0 PCI bridge: PLX Technology, Inc. PEX 8747 48-Lane, 5-Port PCI Express Gen 3 (8.0 GT/s) Switch (rev ca)
+d9:10.0 PCI bridge: PLX Technology, Inc. PEX 8747 48-Lane, 5-Port PCI Express Gen 3 (8.0 GT/s) Switch (rev ca)
+```
+
+In this example the upstream bridge is `d8:00.0`. Then run:
+
+```bash
+./pex8747.py d8:00.0
 ```
