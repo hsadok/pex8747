@@ -272,7 +272,6 @@ class Pex8747Switch:
         self.enable_monitoring()
         self.reset_stats()
 
-        # aggregated_stats = {port: defaultdict(int) for port in ports}
         adj = {port: defaultdict(int) for port in ports}
         all_port_stats = self.get_port_stats(ports)
         for name, value in all_port_stats[0].items():
