@@ -277,6 +277,8 @@ class Pex8747Switch:
         for name, value in all_port_stats[0].items():
             adj[0][name] = -value
 
+        last_stats = {port: defaultdict(int) for port in ports}
+
         while self.running:
             old_stats = all_port_stats
             all_port_stats = self.get_port_stats(ports)
@@ -325,8 +327,24 @@ class Pex8747Switch:
                     s['eg_pdw'] * 4 + s['eg_cpldw'] * 4 + s['eg_npdw'] * 4
                 )
 
+                last_in_bytes = min(last_stats[port]['in_bytes'], in_bytes)
+                last_eg_bytes = min(last_stats[port]['eg_bytes'], eg_bytes)
+                last_in_tlps = min(last_stats[port]['in_tlps'], in_tlps)
+                last_eg_tlps = min(last_stats[port]['eg_tlps'], eg_tlps)
+
+                in_goodput = ((in_bytes - last_in_bytes) * 8 / 1e6) / interval
+                in_rate = (in_tlps - last_in_tlps) / 1e3 / interval
+
+                out_goodput = ((eg_bytes - last_eg_bytes) * 8 / 1e6) / interval
+                out_rate = (eg_tlps - last_eg_tlps) / 1e3 / interval
+
+                last_stats[port]['in_bytes'] = in_bytes
+                last_stats[port]['eg_bytes'] = eg_bytes
+                last_stats[port]['in_tlps'] = in_tlps
+                last_stats[port]['eg_tlps'] = eg_tlps
+
                 print(f'Port {port} stats:')
-                print('  Ingress:')
+                print(f'  Ingress ({in_goodput:.2f} Mbps  {in_rate:.2f} kpps)')
                 print(
                     f'     TLPs: {in_tlps}  (Posted: {s["in_ph"]}, '
                     f'Non-Posted: {in_nph}, Completion: {s["in_cplh"]})'
@@ -336,7 +354,8 @@ class Pex8747Switch:
                     f'Non-Posted: {s["in_npdw"] * 4}, '
                     f'Completion: {s["in_cpldw"] * 4})'
                 )
-                print('   Egress:')
+                print('')
+                print(f'   Egress ({out_goodput:.2f} Mbps  {out_rate:.2f} kpps)')
                 print(
                     f'     TLPs: {eg_tlps}  (Posted: {s["eg_ph"]}, '
                     f'Non-Posted: {eg_nph}, Completion: {s["eg_cplh"]})'
@@ -346,6 +365,7 @@ class Pex8747Switch:
                     f'Non-Posted: {s["eg_npdw"] * 4}, '
                     f'Completion: {s["eg_cpldw"] * 4})'
                 )
+                print('')
             print('')
             await asyncio.sleep(interval)
 
